@@ -1,0 +1,48 @@
+name: pachiplac
+
+# Puertos según la convención de contenedores del proyecto:
+#   postgres -> 5445 (máximo existente de la familia era 5444)
+#   minio    -> 9010 (API) / 9011 (consola) (último minio local usaba 9000/9001)
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: pachiplac-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pachiplac}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pachiplac_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-pachiplac}
+    ports:
+      - '${POSTGRES_PORT:-5445}:5432'
+    volumes:
+      - pachiplac-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-pachiplac} -d ${POSTGRES_DB:-pachiplac}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: pachiplac-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-pachiplac}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-pachiplac_dev_secret}
+    ports:
+      - '${MINIO_API_PORT:-9010}:9000'
+      - '${MINIO_CONSOLE_PORT:-9011}:9001'
+    volumes:
+      - pachiplac-minio-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pachiplac-postgres-data:
+    name: pachiplac-postgres-data
+  pachiplac-minio-data:
+    name: pachiplac-minio-data

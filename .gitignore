@@ -1,0 +1,47 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds y artefactos
+dist/
+build/
+out/
+*.tsbuildinfo
+.vite/
+.turbo/
+.cache/
+
+# Tests y cobertura
+coverage/
+*.lcov
+test-results/
+
+# Variables de entorno (nunca se commitean)
+.env
+.env.*
+!.env.example
+
+# Prisma
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+apps/api/src/generated/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editores
+.idea/
+.vscode/
+*.swp
+
+# Datos locales de contenedores (si alguna vez se montan en el repo)
+minio-data/
+postgres-data/
