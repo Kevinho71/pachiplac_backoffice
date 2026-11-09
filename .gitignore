@@ -22,9 +22,9 @@ test-results/
 !.env.example
 
 # Prisma
-apps/api/prisma/*.db
-apps/api/prisma/*.db-journal
-apps/api/src/generated/
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/src/generated/
 
 # Logs
 logs/
