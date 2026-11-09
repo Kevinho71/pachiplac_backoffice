@@ -7,7 +7,8 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
-    // `prisma db seed` ejecuta este comando (seed idempotente, ver prisma/seed.ts).
+    // `prisma db seed` ejecuta este comando (seed idempotente de datos, ver prisma/seed.ts).
+    // El seed del usuario dueño corre después, dentro del script `db:seed` de backend/package.json.
     seed: 'ts-node --project tsconfig.seed.json prisma/seed.ts',
   },
   datasource: {

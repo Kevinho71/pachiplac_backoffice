@@ -10,21 +10,29 @@
     "start:prod": "node dist/main.js",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.seed.json",
     "test": "vitest run --passWithNoTests",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed && tsx src/seed/crear-usuario.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.0",
     "@nestjs/core": "^12.0.0",
+    "@nestjs/jwt": "^12.0.4",
     "@nestjs/platform-express": "^12.0.0",
-    "@prisma/adapter-pg": "7.10.1",
+    "@nestjs/throttler": "^6.7.1",
+    "@pachiplac/shared": "workspace:*",
+    "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "7.10.1",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "16.4.5",
     "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@nestjs/cli": "^12.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.18.0",
     "@types/pg": "^8.23.1",
     "prisma": "7.10.1",
