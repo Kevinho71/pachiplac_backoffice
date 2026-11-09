@@ -1,0 +1,236 @@
+// =====================================================================
+// Sistema de corte y ventas para melaminas y venestas (PACHIPLAC)
+// Modelo Prisma, fiel a la sección 7 de la especificación.
+//
+// Notas:
+// - Las columnas generadas (`compras.costo_unitario`, `venta_items.subtotal`)
+//   y las vistas (`precio_vigente`, `stock`, `ventas_resumen`) NO se modelan
+//   aquí: se agregan a mano en `migrations/*/migration.sql` (sección 9.6) y se
+//   leen en runtime con `$queryRaw`.
+// - Los CHECK que Prisma no expresa (`saldo <= monto_total`, etc.) también van
+//   en la migración.
+// =====================================================================
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------
+// Enums: categorías de producto y unidad de venta.
+// En la especificación son TEXT + CHECK; aquí se modelan como enum de Prisma
+// (mismo conjunto de valores, pero con tipado estático).
+// ---------------------------------------------------------------------
+enum Categoria {
+  LAMINA
+  CINTA
+  HERRAJE
+}
+
+enum UnidadVenta {
+  MEDIA
+  METRO
+  UNIDAD
+}
+
+// ---------------------------------------------------------------------
+// Sucursales (multitenencia: cada sucursal es totalmente independiente)
+// ---------------------------------------------------------------------
+model Sucursal {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  ciudad    String
+  direccion String?
+  telefono  String?
+  activa    Boolean  @default(true)
+
+  clientes      Cliente[]
+  productos     Producto[]
+  compras       Compra[]
+  ventas        Venta[]
+  ingresosExtra IngresoExtra[]
+
+  @@map("sucursales")
+}
+
+// ---------------------------------------------------------------------
+// Usuarios (login simple, un solo usuario: el dueño)
+// ---------------------------------------------------------------------
+model Usuario {
+  id           Int    @id @default(autoincrement())
+  email        String @unique
+  passwordHash String @map("password_hash")
+
+  @@map("usuarios")
+}
+
+// ---------------------------------------------------------------------
+// Clientes
+// ---------------------------------------------------------------------
+model Cliente {
+  id         Int      @id @default(autoincrement())
+  sucursalId Int      @map("sucursal_id")
+  nombre     String
+  telefono   String?
+
+  sucursal Sucursal @relation(fields: [sucursalId], references: [id])
+  ventas   Venta[]
+
+  @@index([sucursalId], map: "idx_clientes_sucursal")
+  @@map("clientes")
+}
+
+// ---------------------------------------------------------------------
+// Catálogo único: láminas, cinta y artículos de armado
+//   unidad_venta:      MEDIA (láminas), METRO (cinta), UNIDAD (herrajes)
+//   unidades_por_compra: cuántas unidades de venta trae una unidad comprada
+//                        (láminas = 2, resto = 1). CHECK > 0 en la migración.
+//   controla_stock:    si entra al cálculo de inventario
+// ---------------------------------------------------------------------
+model Producto {
+  id                Int         @id @default(autoincrement())
+  sucursalId        Int         @map("sucursal_id")
+  categoria         Categoria
+  nombre            String
+  unidadVenta       UnidadVenta @map("unidad_venta")
+  unidadesPorCompra Int         @default(1) @map("unidades_por_compra")
+  controlaStock     Boolean     @default(true) @map("controla_stock")
+  activo            Boolean     @default(true)
+
+  sucursal        Sucursal         @relation(fields: [sucursalId], references: [id])
+  lamina          Lamina?
+  precioHistorial PrecioHistorial[]
+  compras         Compra[]
+  ventaItems      VentaItem[]
+
+  @@index([sucursalId], map: "idx_productos_sucursal")
+  @@map("productos")
+}
+
+// ---------------------------------------------------------------------
+// Datos propios de las láminas (1 a 1 con productos de categoría LAMINA)
+// ---------------------------------------------------------------------
+model Lamina {
+  productoId Int     @id @map("producto_id")
+  tipo       String
+  color      String?
+  espesorMm  Int     @map("espesor_mm")
+  largoMm    Int     @map("largo_mm")
+  anchoMm    Int     @map("ancho_mm")
+  tieneVeta  Boolean @default(false) @map("tiene_veta")
+
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@map("laminas")
+}
+
+// ---------------------------------------------------------------------
+// Historial de precios, por unidad de venta
+// (láminas: precio de una media = precio de la hoja / 2, lo calcula la app)
+// ---------------------------------------------------------------------
+model PrecioHistorial {
+  id           Int        @id @default(autoincrement())
+  productoId   Int        @map("producto_id")
+  precio       Decimal    @db.Decimal(10, 2)
+  vigenteDesde DateTime   @default(now()) @map("vigente_desde") @db.Timestamptz(6)
+
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@index([productoId, vigenteDesde(sort: Desc)], map: "idx_precio_historial_producto")
+  @@map("precio_historial")
+}
+
+// ---------------------------------------------------------------------
+// Compras (reabastecimiento), por paquete o por unidades sueltas.
+//   costo_unitario = costo_total / cantidad  -> columna generada (migración)
+// ---------------------------------------------------------------------
+model Compra {
+  id         Int      @id @default(autoincrement())
+  sucursalId Int      @map("sucursal_id")
+  productoId Int      @map("producto_id")
+  fecha      DateTime @default(dbgenerated("current_date")) @map("fecha") @db.Date
+  cantidad   Int
+  costoTotal Decimal  @map("costo_total") @db.Decimal(10, 2)
+
+  sucursal Sucursal @relation(fields: [sucursalId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@index([sucursalId], map: "idx_compras_sucursal")
+  @@index([productoId], map: "idx_compras_producto")
+  @@map("compras")
+}
+
+// ---------------------------------------------------------------------
+// Ventas
+//   numero: secuencial POR sucursal (UNIQUE (sucursal_id, numero))
+//   saldo:  lo que falta pagar; pagado = monto_total - saldo
+//   esquema: todos los cortes de la venta (JSONB); NULL si no hubo cortes
+//   CHECK (saldo <= monto_total) y CHECK (nro_factura IS NULL OR es_factura)
+//   van en la migración (Prisma no expresa CHECK).
+// ---------------------------------------------------------------------
+model Venta {
+  ordenVenta Int      @id @default(autoincrement()) @map("orden_venta")
+  sucursalId Int      @map("sucursal_id")
+  numero     Int
+  clienteId  Int?     @map("cliente_id")
+  fecha      DateTime @default(now()) @map("fecha") @db.Timestamptz(6)
+  montoTotal Decimal  @map("monto_total") @db.Decimal(10, 2)
+  saldo      Decimal  @db.Decimal(10, 2)
+  metodoPago String   @map("metodo_pago")
+  esFactura  Boolean  @default(false) @map("es_factura")
+  nroFactura String?  @map("nro_factura")
+  entregado  Boolean  @default(false)
+  esquema    Json?    @db.JsonB
+
+  sucursal Sucursal   @relation(fields: [sucursalId], references: [id])
+  cliente  Cliente?   @relation(fields: [clienteId], references: [id])
+  items    VentaItem[]
+
+  @@unique([sucursalId, numero])
+  @@index([sucursalId], map: "idx_ventas_sucursal")
+  @@index([fecha(sort: Desc)], map: "idx_ventas_fecha")
+  @@index([clienteId], map: "idx_ventas_cliente")
+  @@map("ventas")
+}
+
+// ---------------------------------------------------------------------
+// Detalle de ventas: una sola tabla para todo lo que se vende
+//   subtotal = cantidad * precio_unitario  -> columna generada (migración)
+// ---------------------------------------------------------------------
+model VentaItem {
+  id             Int     @id @default(autoincrement())
+  ordenVenta     Int     @map("orden_venta")
+  productoId     Int     @map("producto_id")
+  cantidad       Decimal @db.Decimal(10, 2)
+  precioUnitario Decimal @map("precio_unitario") @db.Decimal(10, 2)
+
+  venta    Venta    @relation(fields: [ordenVenta], references: [ordenVenta], onDelete: Cascade)
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@index([ordenVenta], map: "idx_venta_items_orden")
+  @@index([productoId], map: "idx_venta_items_producto")
+  @@map("venta_items")
+}
+
+// ---------------------------------------------------------------------
+// Ingresos extra (retazos vendidos). Fuera del inventario.
+// ---------------------------------------------------------------------
+model IngresoExtra {
+  id          Int      @id @default(autoincrement())
+  sucursalId  Int      @map("sucursal_id")
+  fecha       DateTime @default(dbgenerated("current_date")) @map("fecha") @db.Date
+  material    String
+  precioPieza Decimal  @default(0) @map("precio_pieza") @db.Decimal(10, 2)
+  precioCinta Decimal  @default(0) @map("precio_cinta") @db.Decimal(10, 2)
+  montoTotal  Decimal  @map("monto_total") @db.Decimal(10, 2)
+
+  sucursal Sucursal @relation(fields: [sucursalId], references: [id])
+
+  @@index([sucursalId], map: "idx_ingresos_extra_sucursal")
+  @@map("ingresos_extra")
+}
