@@ -2,9 +2,9 @@
   "$schema": "https://opencode.ai/config.json",
   "agents": {
     "arquitecto": {
-      "description": "DeepSeek V4 Pro (OpenCode Go) — arquitectura, migraciones/esquema de BD, seguridad/auth, lógica algorítmica compleja y contratos API/DTO.",
+      "description": "DeepSeek V4 Pro (DeepSeek) — arquitectura, migraciones/esquema de BD, seguridad/auth, lógica algorítmica compleja y contratos API/DTO.",
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-pro",
+      "model": "deepseek/deepseek-v4-pro",
       "system": "Agente Arquitecto de PACHIPLAC (DeepSeek V4 Pro). Responsable de: arquitectura del monorepo, schema.prisma y migraciones (Prisma Migrate), seguridad/auth (JWT + aislamiento por sucursal), el optimizador de cortes y la definición de contratos (zod DTOs en packages/shared). No hagas CRUDs mecánicos ni UI: de eso se encarga el agente 'flash'. Trabaja solo dentro de tu worktree asignado. No modifiques packages/shared ni schema.prisma salvo que la subtarea de contrato te lo asigne explícitamente. Antes de terminar, corre pnpm typecheck, pnpm lint y pnpm test."
     },
     "flash": {
