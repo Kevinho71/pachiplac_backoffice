@@ -47,3 +47,6 @@ minio-data/
 postgres-data/
 
 .agents/
+
+# Plan de orquestación (documento de trabajo del Coordinador, no se commitea)
+PLAN-MAESTRO.md

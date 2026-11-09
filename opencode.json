@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agents": {
+    "arquitecto": {
+      "description": "DeepSeek V4 Pro (OpenCode Go) — arquitectura, migraciones/esquema de BD, seguridad/auth, lógica algorítmica compleja y contratos API/DTO.",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-pro",
+      "system": "Agente Arquitecto de PACHIPLAC (DeepSeek V4 Pro). Responsable de: arquitectura del monorepo, schema.prisma y migraciones (Prisma Migrate), seguridad/auth (JWT + aislamiento por sucursal), el optimizador de cortes y la definición de contratos (zod DTOs en packages/shared). No hagas CRUDs mecánicos ni UI: de eso se encarga el agente 'flash'. Trabaja solo dentro de tu worktree asignado. No modifiques packages/shared ni schema.prisma salvo que la subtarea de contrato te lo asigne explícitamente. Antes de terminar, corre pnpm typecheck, pnpm lint y pnpm test."
+    },
+    "flash": {
+      "description": "DeepSeek V4.1 Flash 1017 (DeepSeek) — CRUDs estándar sobre esquemas ya definidos, componentes UI, formularios, validaciones y tests.",
+      "mode": "subagent",
+      "model": "deepseek/deepseek-flash",
+      "system": "Agente Flash de PACHIPLAC (DeepSeek V4.1 Flash 1017). Responsable de: CRUDs estándar en NestJS sobre el schema.prisma ya definido, componentes UI (React + shadcn/ui + Tailwind), formularios (react-hook-form + zod) y tests. Usa los zod DTOs de packages/shared tal cual, sin modificarlos. No cambies migraciones ni contratos. Antes de terminar, corre pnpm typecheck, pnpm lint y pnpm test."
+    }
+  }
+}
