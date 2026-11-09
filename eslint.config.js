@@ -10,7 +10,11 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          // El CLI de Prisma y su seed viven fuera de `backend/src`, así que no
+          // entran en el tsconfig de la app: se lintean con el proyecto por defecto.
+          allowDefaultProject: ['backend/prisma/*.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
