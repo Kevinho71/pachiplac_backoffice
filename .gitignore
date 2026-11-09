@@ -45,3 +45,5 @@ Desktop.ini
 # Datos locales de contenedores (si alguna vez se montan en el repo)
 minio-data/
 postgres-data/
+
+.agents/
