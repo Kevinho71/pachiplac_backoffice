@@ -137,6 +137,8 @@ memoria, se optimiza y se imprime.
 
 ## Convenciones de trabajo
 
+- **Al cerrar cada fase se abre un PR contra `development`.** Se trabaja en ramas locales
+  (`feat/...`, `fix/...`); **no se usan worktrees**.
 - Ramas `feat/`, `fix/`, `chore/`, `refactor/`, `docs/`, `test/` y PR contra la rama de
   integración; Conventional Commits con scope `(back)`/`(front)` cuando aplique.
 - Todo cambio de esquema de base de datos va por migración (Prisma Migrate), nunca SQL a
