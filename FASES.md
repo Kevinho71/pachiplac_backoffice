@@ -127,13 +127,13 @@ Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
 
 **Objetivo:** registrar una venta completa de principio a fin.
 
-- [ ] Ítems genéricos: lámina (medias), cinta suelta (metros) y herraje (unidades).
-- [ ] **Cinta colocada** calculada automáticamente desde el esquema.
-- [ ] **Numeración de nota por sucursal** (`UNIQUE (sucursal_id, numero)`).
-- [ ] Saldo (`monto_total − cobrado`) y **regla del 50%** (avisa, no bloquea).
-- [ ] Esquema guardado en **JSONB** y recalculado al editar (misma transacción).
-- [ ] Impresión: **nota pequeña** (sin cortes) y **pedido de corte** (una página por hoja).
-- [ ] CRUD de **clientes**.
+- [x] Ítems genéricos: lámina (medias), cinta suelta (metros) y herraje (unidades).
+- [x] **Cinta colocada** calculada automáticamente desde el esquema.
+- [x] **Numeración de nota por sucursal** (`UNIQUE (sucursal_id, numero)`).
+- [x] Saldo (`monto_total − cobrado`) y **regla del 50%** (avisa, no bloquea).
+- [x] Esquema guardado en **JSONB** y recalculado al editar (misma transacción).
+- [x] Impresión: **nota pequeña** (sin cortes) y **pedido de corte** (una página por hoja).
+- [x] CRUD de **clientes**.
 
 **Entregable:** una venta completa con esquema guardado, reimpresión y nota/pedido impresos.
 
