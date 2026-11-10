@@ -4,6 +4,10 @@
   "private": true,
   "description": "API NestJS de PACHIPLAC (cortes, ventas e inventario de melaminas)",
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "prebuild": "pnpm prisma:generate",
+    "pretypecheck": "pnpm prisma:generate",
+    "pretest": "pnpm prisma:generate",
     "build": "nest build",
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
