@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
+    "esModuleInterop": true,
     "verbatimModuleSyntax": false,
     "declaration": false,
     "outDir": "dist",
