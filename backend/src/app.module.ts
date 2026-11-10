@@ -4,6 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { AuthModule } from './auth/auth.module'
 import { ClientesModule } from './clientes/clientes.module'
 import { ComprasModule } from './compras/compras.module'
+import { IngresosExtraModule } from './ingresos-extra/ingresos-extra.module'
 import { LaminasModule } from './laminas/laminas.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { ProductosModule } from './productos/productos.module'
@@ -23,6 +24,7 @@ import { VentasModule } from './ventas/ventas.module'
     StockModule,
     ClientesModule,
     VentasModule,
+    IngresosExtraModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
