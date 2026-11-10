@@ -159,4 +159,9 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* El zoom/arrastre del esquema es solo de pantalla. */
+  .esquema-zoom__lienzo {
+    transform: none !important;
+  }
 }

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { colorDeCinta } from '../cinta-colores'
 import { metrosDeHoja } from '../cinta-hoja'
 import { formatearDimensiones, formatearMetros, TIPO_HOJA_LABEL } from '../constantes'
-import { EsquemaSvg } from './EsquemaSvg'
+import { EsquemaZoom } from './EsquemaZoom'
 
 interface HojaCardProps {
   hoja: HojaResultado
@@ -49,7 +49,7 @@ export function HojaCard({
       </CardHeader>
 
       <CardContent className="p-3 sm:p-4">
-        <EsquemaSvg
+        <EsquemaZoom
           hoja={hoja}
           refiladoMm={refiladoMm}
           mostrarCortes={mostrarCortes}
