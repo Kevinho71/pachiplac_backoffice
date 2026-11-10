@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { AuthModule } from './auth/auth.module'
+import { ClientesModule } from './clientes/clientes.module'
 import { ComprasModule } from './compras/compras.module'
 import { LaminasModule } from './laminas/laminas.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { ProductosModule } from './productos/productos.module'
 import { StockModule } from './stock/stock.module'
 import { SucursalesModule } from './sucursales/sucursales.module'
+import { VentasModule } from './ventas/ventas.module'
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { SucursalesModule } from './sucursales/sucursales.module'
     LaminasModule,
     ComprasModule,
     StockModule,
+    ClientesModule,
+    VentasModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
