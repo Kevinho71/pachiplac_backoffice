@@ -9,6 +9,7 @@ import { ProductosPage } from './features/catalogo/ProductosPage'
 import { PreciosPage } from './features/catalogo/PreciosPage'
 import { EditorPage } from './features/editor/components/EditorPage'
 import { InventarioPage } from './features/inventario/InventarioPage'
+import { IngresosExtraPage } from './features/ingresos-extra/IngresosExtraPage'
 import { EditarEsquemaVentaPage } from './features/ventas/EditarEsquemaVentaPage'
 import { EsquemaVentaPage } from './features/ventas/EsquemaVentaPage'
 import { ImpresionVentaPage } from './features/ventas/ImpresionVentaPage'
@@ -49,6 +50,7 @@ export function App() {
               <Route path="/productos/:id" element={<ProductoFormPage />} />
               <Route path="/productos/:id/precios" element={<PreciosPage />} />
               <Route path="/inventario" element={<InventarioPage />} />
+              <Route path="/ingresos-extra" element={<IngresosExtraPage />} />
             </Route>
           </Route>
 
