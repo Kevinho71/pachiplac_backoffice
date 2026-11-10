@@ -10,6 +10,9 @@ stack: TypeScript (React + NestJS) · Prisma · PostgreSQL 15 · pnpm workspaces
 > [`sistema-melaminas-especificacion.md`](sistema-melaminas-especificacion.md).
 > Las skills pertinentes del proyecto están documentadas en [`.agents/README.md`](.agents/README.md).
 
+> **Regla de entrega:** al terminar cada fase se abre un **PR contra `development`**.
+> Se trabaja en ramas locales; **no se usan worktrees**.
+
 ## Skills pertinentes
 
 Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
