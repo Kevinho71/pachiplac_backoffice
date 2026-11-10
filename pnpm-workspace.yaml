@@ -3,5 +3,9 @@ packages:
   - 'frontend'
   - 'packages/*'
 
+auditConfig:
+  ignoreGhsas:
+    - GHSA-mrhx-c7xc-m3w5
+
 onlyBuiltDependencies:
   - esbuild

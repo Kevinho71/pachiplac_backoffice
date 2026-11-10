@@ -8,8 +8,11 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "pretest": "pnpm --filter @pachiplac/backend prisma:generate",
     "test": "vitest run",
+    "pretest:watch": "pnpm --filter @pachiplac/backend prisma:generate",
     "test:watch": "vitest",
+    "pretest:coverage": "pnpm --filter @pachiplac/backend prisma:generate",
     "test:coverage": "vitest run --coverage",
     "typecheck": "pnpm -r --if-present typecheck",
     "build:shared": "pnpm --filter @pachiplac/shared build",
@@ -19,6 +22,7 @@
     "dev:frontend": "pnpm --filter @pachiplac/frontend dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "audit": "pnpm audit --audit-level high",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
