@@ -1,0 +1,19 @@
+# Contexto de build del backend (Dockerfile en backend/Dockerfile).
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+backend/src/generated
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.gitignore
+.github
+.agents
+coverage
+postgres-data
+frontend
+PLAN-MAESTRO.md
+FASES.md
+sistema-melaminas-especificacion.md
+especificaciones.md
