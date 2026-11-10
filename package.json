@@ -20,6 +20,7 @@
     "build:frontend": "pnpm --filter @pachiplac/frontend build",
     "dev:backend": "pnpm --filter @pachiplac/shared build && pnpm --filter @pachiplac/backend start:dev",
     "dev:frontend": "pnpm --filter @pachiplac/frontend dev",
+    "prelint": "pnpm --filter @pachiplac/backend prisma:generate",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "audit": "pnpm audit --audit-level high",
