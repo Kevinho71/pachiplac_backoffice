@@ -149,7 +149,8 @@
     page-break-after: always;
   }
 
-  .print-page:last-child {
+  .print-page:last-child,
+  .print-page:last-of-type {
     break-after: auto;
     page-break-after: auto;
   }
