@@ -9,9 +9,10 @@ Documentación de referencia: [`FASES.md`](FASES.md) (plan de fases) y
 
 | Fase | Estado |
 |---|---|
-| 0 — Base y fundamentos | Parcial: monorepo pnpm, contenedores PostgreSQL/MinIO y tooling. Falta Prisma, migraciones, seed y auth. |
-| 1 — Optimizador de cortes | **Completada**: `packages/optimizer` con algoritmo, validador, secuencia de cortes y metros de cinta, cubierto con Vitest + fast-check. |
-| 2 en adelante | Pendiente. |
+| 0 — Base y fundamentos | **Completada**: monorepo pnpm, PostgreSQL/MinIO, Prisma con migración inicial (tablas, vistas y columnas generadas), seed idempotente y auth con JWT. |
+| 1 — Optimizador de cortes | **Completada**: `packages/optimizer` con algoritmo, validador, secuencia de cortes y metros de cinta, cubierto con Vitest + fast-check. Pendiente: reemplazar los fixtures provisionales por trabajos reales del dueño. |
+| 2 — Editor de esquema | **Completada**: tabla de piezas, cinta por lado, hoja editable, optimizador en Web Worker, dibujo SVG con cortes numerados e impresión. Pendiente: mover piezas entre hojas y fijar posiciones (requiere extender el optimizador). |
+| 3 en adelante | Pendiente. |
 
 ## Requisitos
 
@@ -38,6 +39,8 @@ Comandos disponibles:
 | `pnpm typecheck` | TypeScript estricto en todo el workspace |
 | `pnpm lint` | ESLint (flat config + typescript-eslint) |
 | `pnpm format` | Prettier |
+| `pnpm dev:frontend` | Levanta el editor en `http://localhost:5173` |
+| `pnpm build:frontend` | Build de producción del editor |
 | `pnpm --filter @pachiplac/optimizer demo [n]` | Imprime el resultado del optimizador para un trabajo de ejemplo |
 
 ## Contenedores locales
@@ -63,9 +66,11 @@ docker compose down
 ## Estructura
 
 ```
-apps/                 # React + Vite y NestJS (fases siguientes)
+backend/              # API NestJS + Prisma
+  prisma/             # schema, migraciones y seed
+frontend/             # React 18 + Vite (editor de cortes)
 packages/
-  shared/             # cinta de canto, dinero y tipos compartidos
+  shared/             # cinta de canto, dinero, DTOs zod y tipos compartidos
   optimizer/          # optimizador guillotina, validador y secuencia de cortes
 .agents/              # skills del proyecto + manifiesto
 docker-compose.yml
@@ -108,6 +113,27 @@ API pública: `optimizar(piezas, hojas, opciones)` y `validarHoja(hoja, opciones
 > Los trabajos de `src/__fixtures__/trabajos-reales.ts` son **provisionales**. Hay que
 > reemplazarlos por los 5–10 trabajos que el dueño ya cortó con SketchCut (piezas,
 > material y hojas gastadas) para que la comparación sea real.
+
+## Editor de cortes (`frontend`)
+
+Pantalla única de la Fase 2, todavía **sin persistencia**: se arma el pedido en
+memoria, se optimiza y se imprime.
+
+- Tabla de piezas editable (largo, ancho, cantidad, rotación y cinta por lado con
+  color independiente). El alta rápida usa `react-hook-form` + `zod`.
+- Hoja configurable (presets de melamina/ventas o medida personalizada), kerf,
+  refilado opcional, modo de corte y opciones avanzadas (tiempo y semilla).
+- **Optimizador en Web Worker** con Comlink: la interfaz no se congela.
+- Dibujo **SVG** a escala real (mm) con la secuencia numerada de cortes, la línea
+  de cinta en cada lado y el resumen de cinta por color.
+- **Vista previa de impresión** (`@media print`): una página por hoja, con el
+  espacio para el sello de CANCELADO.
+- Estado con **Zustand** y estilos con **Tailwind CSS v4**.
+
+> Limitación conocida: mover una pieza ya ubicada a otra hoja y fijar posiciones
+> requiere extender el optimizador (hoy empaqueta todo desde cero). El editor sí
+> permite voltear piezas (intercambiar largo ↔ ancho), cambiar la prioridad con
+> las flechas y reoptimizar.
 
 ## Convenciones de trabajo
 

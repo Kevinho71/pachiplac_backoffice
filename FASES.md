@@ -49,14 +49,14 @@ Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
 
 **Objetivo:** dejar el monorepo, la base de datos, las migraciones y el login esqueleto funcionando.
 
-- [ ] Monorepo con **pnpm workspaces**: `apps/web`, `apps/api`, `packages/optimizer`, `packages/shared`.
-- [ ] **Docker + docker compose** con PostgreSQL 15+ local.
-- [ ] **Prisma**: `schema.prisma` + migración inicial con el esquema completo de la especificación (sección 7), incluyendo `sucursales` y `sucursal_id` en todas las tablas.
-- [ ] Vistas (`stock`, `precio_vigente`, `ventas_resumen`) y columnas generadas (`costo_unitario`, `subtotal`) vía SQL crudo en la migración.
-- [ ] **Seed**: 2 sucursales + productos de cinta por sucursal (3 Bs colocada, 1,50 Bs suelta).
-- [ ] **ESLint + Prettier** y TypeScript estricto de punta a punta.
-- [ ] `packages/shared`: tipos, esquemas `zod`, manejo de dinero (`decimal.js` o centavos enteros).
-- [ ] Login esqueleto: `bcrypt`/`argon2` + JWT en cookie `httpOnly` + selector de sucursal.
+- [x] Monorepo con **pnpm workspaces**: `backend`, `frontend`, `packages/optimizer`, `packages/shared`.
+- [x] **Docker + docker compose** con PostgreSQL 15+ local.
+- [x] **Prisma**: `schema.prisma` + migración inicial con el esquema completo de la especificación (sección 7), incluyendo `sucursales` y `sucursal_id` en todas las tablas.
+- [x] Vistas (`stock`, `precio_vigente`, `ventas_resumen`) y columnas generadas (`costo_unitario`, `subtotal`) vía SQL crudo en la migración.
+- [x] **Seed**: 2 sucursales + productos de cinta por sucursal (3 Bs colocada, 1,50 Bs suelta).
+- [x] **ESLint + Prettier** y TypeScript estricto de punta a punta.
+- [x] `packages/shared`: tipos, esquemas `zod`, manejo de dinero (`decimal.js` o centavos enteros).
+- [x] Login esqueleto: `bcrypt`/`argon2` + JWT en cookie `httpOnly` + selector de sucursal.
 
 **Entregable:** `docker compose up` levanta el proyecto con la base migrada y 2 sucursales de ejemplo.
 
@@ -68,15 +68,15 @@ Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
 
 **Objetivo:** implementar una sola vez, en TypeScript puro, el algoritmo guillotina completo y testeado.
 
-- [ ] Tipos del contrato (sección 6.1) en `packages/optimizer`.
-- [ ] Algoritmo guillotina: modos `DOS_ETAPAS` y `GUILLOTINA_LIBRE`.
-- [ ] **Kerf** (4 mm) y **refilado** (5 mm por lado, encendido por defecto, opcional).
-- [ ] **Rotación libre** (intercambiar `largo ↔ ancho`) para todos los materiales.
-- [ ] **Media hoja** (a lo largo / a lo ancho) y bajada de hoja entera a media.
-- [ ] **Secuencia de cortes** numerada y **retazo mayor**.
-- [ ] **Validador** de guillotina (cualquier esquema sigue siendo cortable).
-- [ ] Cálculo de **metros de cinta** por color (función compartida, sección 5.9).
-- [ ] Pruebas con **fast-check** (sin solapes, todo cabe, cortes de lado a lado) + **5–10 trabajos reales** del dueño como referencia.
+- [x] Tipos del contrato (sección 6.1) en `packages/optimizer`.
+- [x] Algoritmo guillotina: modos `DOS_ETAPAS` y `GUILLOTINA_LIBRE`.
+- [x] **Kerf** (4 mm) y **refilado** (5 mm por lado, encendido por defecto, opcional).
+- [x] **Rotación libre** (intercambiar `largo ↔ ancho`) para todos los materiales.
+- [x] **Media hoja** (a lo largo / a lo ancho) y bajada de hoja entera a media.
+- [x] **Secuencia de cortes** numerada y **retazo mayor**.
+- [x] **Validador** de guillotina (cualquier esquema sigue siendo cortable).
+- [x] Cálculo de **metros de cinta** por color (función compartida, sección 5.9).
+- [x] Pruebas con **fast-check** (sin solapes, todo cabe, cortes de lado a lado). **Pendiente:** reemplazar los 7 fixtures provisionales por 5–10 trabajos reales del dueño.
 
 **Entregable:** dado un set de piezas, devuelve hojas, posiciones, cortes y cinta; validado contra trabajos reales.
 
@@ -88,13 +88,14 @@ Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
 
 **Objetivo:** armar, ajustar e imprimir un esquema de corte, aún sin guardarlo.
 
-- [ ] Tabla de piezas: largo, ancho, cantidad, rotación (largo↔ancho) y cinta por lado (color).
-- [ ] **Dimensiones de hoja editables** (por defecto las del material).
-- [ ] Optimizador en **Web Worker** (Comlink) para no congelar la pantalla.
-- [ ] Dibujo del esquema en **SVG** o **react-konva**, con la secuencia numerada de cortes.
-- [ ] Línea gruesa del color de la cinta en cada lado con cinta.
-- [ ] Volteo y movimiento de piezas, fijar y reoptimizar.
-- [ ] Vista previa de impresión (`@media print`).
+- [x] Tabla de piezas: largo, ancho, cantidad, rotación (largo↔ancho) y cinta por lado (color).
+- [x] **Dimensiones de hoja editables** (por defecto las del material).
+- [x] Optimizador en **Web Worker** (Comlink) para no congelar la pantalla.
+- [x] Dibujo del esquema en **SVG**, con la secuencia numerada de cortes.
+- [x] Línea gruesa del color de la cinta en cada lado con cinta.
+- [x] **Volteo** de piezas (intercambiar largo ↔ ancho), prioridad con flechas y **reoptimizar**.
+- [ ] Mover piezas ya ubicadas a otra hoja y fijar posiciones: requiere extender el optimizador.
+- [x] Vista previa de impresión (`@media print`).
 
 **Entregable:** el dueño arma e imprime un esquema completo, sin persistencia todavía.
 
