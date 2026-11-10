@@ -12,7 +12,8 @@ Documentación de referencia: [`FASES.md`](FASES.md) (plan de fases) y
 | 0 — Base y fundamentos | **Completada**: monorepo pnpm, PostgreSQL/MinIO, Prisma con migración inicial (tablas, vistas y columnas generadas), seed idempotente y auth con JWT. |
 | 1 — Optimizador de cortes | **Completada**: `packages/optimizer` con algoritmo, validador, secuencia de cortes y metros de cinta, cubierto con Vitest + fast-check. Pendiente: reemplazar los fixtures provisionales por trabajos reales del dueño. |
 | 2 — Editor de esquema | **Completada**: tabla de piezas, cinta por lado, hoja editable, optimizador en Web Worker, dibujo SVG con cortes numerados e impresión. Pendiente: mover piezas entre hojas y fijar posiciones (requiere extender el optimizador). |
-| 3 en adelante | Pendiente. |
+| 3 — Catálogo, precios e inventario | **Completada**: login + selector de sucursal, CRUD de productos/láminas, historial de precios, compras y stock por sucursal, con aislamiento multitenant. |
+| 4 en adelante | Pendiente. |
 
 ## Requisitos
 
@@ -26,8 +27,13 @@ Documentación de referencia: [`FASES.md`](FASES.md) (plan de fases) y
 corepack enable pnpm
 pnpm install
 docker compose up -d
+pnpm dev:backend    # compila @pachiplac/shared y levanta la API en :3000
+pnpm dev:frontend   # editor, catálogo e inventario en :5173
 pnpm test
 ```
+
+> `@pachiplac/shared` se compila a CommonJS en `packages/shared/dist` para que NestJS lo
+> consuma en runtime. `pnpm dev:backend` y `pnpm build:backend` lo compilan antes de arrancar.
 
 Comandos disponibles:
 
@@ -39,8 +45,11 @@ Comandos disponibles:
 | `pnpm typecheck` | TypeScript estricto en todo el workspace |
 | `pnpm lint` | ESLint (flat config + typescript-eslint) |
 | `pnpm format` | Prettier |
-| `pnpm dev:frontend` | Levanta el editor en `http://localhost:5173` |
-| `pnpm build:frontend` | Build de producción del editor |
+| `pnpm dev:backend` | Compila `shared` y levanta la API NestJS en `:3000` |
+| `pnpm dev:frontend` | Levanta el frontend en `http://localhost:5173` |
+| `pnpm build:shared` | Compila `@pachiplac/shared` a CommonJS |
+| `pnpm build:backend` | Compila `shared` y la API |
+| `pnpm build:frontend` | Build de producción del frontend |
 | `pnpm --filter @pachiplac/optimizer demo [n]` | Imprime el resultado del optimizador para un trabajo de ejemplo |
 
 ## Contenedores locales
@@ -134,6 +143,23 @@ memoria, se optimiza y se imprime.
 > requiere extender el optimizador (hoy empaqueta todo desde cero). El editor sí
 > permite voltear piezas (intercambiar largo ↔ ancho), cambiar la prioridad con
 > las flechas y reoptimizar.
+
+## Catálogo e inventario (`frontend` + `backend`)
+
+- **Login** con JWT en cookie `httpOnly` y **selector de sucursal**; la sucursal activa
+  viaja en el token y el backend la aplica como filtro en **toda** consulta
+  (`SucursalGuard`, nunca desde el cuerpo de la petición).
+- **Catálogo** por sucursal: alta, edición y baja lógica de productos y láminas (tipo,
+  color, espesor, medidas y veta), precio inicial e **historial de precios**. El precio
+  de una lámina se guarda por **media hoja**; la app pide el precio de la hoja y calcula
+  la mitad.
+- **Inventario**: compras por paquete o por hojas sueltas con `costo_unitario`
+  calculado, y **stock** leído de la vista `stock` (compras − ventas; para láminas se
+  muestra en hojas + media).
+- Endpoints: `/auth/sesion`, `/productos` (+ `/:id/precios`), `/laminas`, `/compras` y
+  `/stock`, todos filtrados por la sucursal de la sesión.
+
+> Usuario de desarrollo del seed: `admin@pachiplac.com` / `cambiar123`.
 
 ## Convenciones de trabajo
 
