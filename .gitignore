@@ -48,5 +48,7 @@ postgres-data/
 
 .agents/
 
-# Plan de orquestación (documento de trabajo del Coordinador, no se commitea)
+# Documentos de trabajo (no se commitean)
 PLAN-MAESTRO.md
+FASES.md
+sistema-melaminas-especificacion.md
