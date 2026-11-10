@@ -1,4 +1,4 @@
-import { createParamDecorator, type ExecutionContext } from '@nestjs/common'
+import { BadRequestException, createParamDecorator, type ExecutionContext } from '@nestjs/common'
 import type { RequestConSesion } from './sesion.types'
 
 /**
@@ -10,5 +10,20 @@ export const SucursalActiva = createParamDecorator(
   (_data: unknown, context: ExecutionContext): number | null => {
     const req = context.switchToHttp().getRequest<RequestConSesion>()
     return req.usuario?.sucursalId ?? null
+  },
+)
+
+/**
+ * Igual que {@link SucursalActiva}, pero para rutas protegidas por
+ * `SucursalGuard`: garantiza un `number` y falla si no hay sucursal activa.
+ */
+export const SucursalRequerida = createParamDecorator(
+  (_data: unknown, context: ExecutionContext): number => {
+    const req = context.switchToHttp().getRequest<RequestConSesion>()
+    const sucursalId = req.usuario?.sucursalId
+    if (sucursalId === null || sucursalId === undefined) {
+      throw new BadRequestException('Elegí una sucursal activa para continuar')
+    }
+    return sucursalId
   },
 )
