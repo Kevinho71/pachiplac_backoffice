@@ -91,6 +91,8 @@ interface EditorState {
   moverPieza: (id: string, direccion: -1 | 1) => void
   setOpcion: <K extends keyof OpcionesEditor>(clave: K, valor: OpcionesEditor[K]) => void
   setColorActivo: (color: string) => void
+  /** Carga un pedido concreto (vacío al empezar un esquema de venta). */
+  cargar: (piezas: PiezaEditor[], opciones?: Partial<OpcionesEditor>) => void
   optimizar: () => Promise<void>
   reiniciar: () => void
 }
@@ -161,6 +163,15 @@ export const useEditor = create<EditorState>()((set, get) => ({
     set((state) => ({ opciones: { ...state.opciones, [clave]: valor } })),
 
   setColorActivo: (color) => set({ colorActivo: color }),
+
+  cargar: (piezas, opciones) =>
+    set({
+      piezas,
+      opciones: { ...OPCIONES_INICIALES, ...opciones },
+      estado: 'inactivo',
+      resultado: null,
+      error: null,
+    }),
 
   optimizar: async () => {
     const { piezas, opciones } = get()

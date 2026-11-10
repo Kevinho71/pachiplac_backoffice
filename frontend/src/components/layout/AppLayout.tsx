@@ -1,4 +1,4 @@
-import { Boxes, LogOut, Package, Scissors } from 'lucide-react'
+import { Boxes, LogOut, Package, Receipt, Scissors } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { Marca } from './Marca'
 
 const NAV = [
+  { to: '/ventas', label: 'Ventas', icon: Receipt },
   { to: '/editor', label: 'Editor', icon: Scissors },
   { to: '/productos', label: 'Catálogo', icon: Package },
   { to: '/inventario', label: 'Inventario', icon: Boxes },

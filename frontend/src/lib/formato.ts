@@ -16,6 +16,11 @@ export function formatearPrecio(precio: string | null, unidad: UnidadVenta): str
   return `Bs ${precio} / ${sufijoUnidad(unidad)}`
 }
 
+/** Monto en bolivianos ya formateado por el backend (2 decimales). */
+export function formatearBs(monto: string): string {
+  return `Bs ${monto}`
+}
+
 /** Stock en unidad de venta; para láminas lo muestra como hojas + media. */
 export function formatearStock(stock: number | null, unidad: UnidadVenta): string {
   if (stock === null) return '—'
