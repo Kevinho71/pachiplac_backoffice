@@ -110,12 +110,12 @@ Skills que aplican a este proyecto, cargadas según la fase en la que se trabaje
 
 **Objetivo:** productos, láminas, precios, compras y stock, todo por sucursal.
 
-- [ ] Login + **selector de sucursal** (sucursal activa en la sesión).
-- [ ] CRUD de **productos** y **láminas** por sucursal (tipo, color, espesor, medidas, veta).
-- [ ] **Historial de precios** (precios editables por el dueño, no archivos de configuración).
-- [ ] **Compras** (paquetes o unidades) con `costo_unitario` calculado.
-- [ ] Vista de **stock** por sucursal (medias y hojas).
-- [ ] Middleware de **aislamiento por sucursal** en toda consulta.
+- [x] Login + **selector de sucursal** (sucursal activa en la sesión).
+- [x] CRUD de **productos** y **láminas** por sucursal (tipo, color, espesor, medidas, veta).
+- [x] **Historial de precios** (precios editables por el dueño, no archivos de configuración).
+- [x] **Compras** (paquetes o unidades) con `costo_unitario` calculado.
+- [x] Vista de **stock** por sucursal (medias y hojas).
+- [x] Middleware de **aislamiento por sucursal** en toda consulta.
 
 **Entregable:** registrar un reabastecimiento y ver el stock de la sucursal activa.
 
