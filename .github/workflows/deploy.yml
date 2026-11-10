@@ -1,0 +1,96 @@
+name: Deploy AWS
+
+# Despliegue manual (no corre en cada push). Requiere configurar una vez:
+#   Secrets:  AWS_DEPLOY_ROLE_ARN (rol OIDC con permisos de ECR, S3, CloudFront)
+#   Vars:     AWS_REGION, AWS_ACCOUNT_ID, ECR_REPOSITORY, S3_BUCKET,
+#             CLOUDFRONT_DISTRIBUTION_ID, VITE_API_URL
+#
+# La base RDS, el bucket, la distribución CloudFront, el repositorio ECR,
+# el servicio App Runner y los parámetros de SSM se provisionan una sola vez
+# fuera de este workflow. App Runner debe tener "AutoDeploymentsEnabled" para
+# desplegar la imagen nueva al hacer push a ECR.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aws-production
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  S3_BUCKET: ${{ vars.S3_BUCKET }}
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+  VITE_API_URL: ${{ vars.VITE_API_URL }}
+
+jobs:
+  deploy:
+    name: Backend (ECR + App Runner) y frontend (S3 + CloudFront)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Login en ECR
+        run: |
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin \
+              "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+
+      - name: Build y push del backend
+        run: |
+          IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$GITHUB_SHA"
+          docker build -f backend/Dockerfile -t "$IMAGE" .
+          docker tag "$IMAGE" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest"
+          docker push "$IMAGE"
+          docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest"
+
+      - name: Build del frontend
+        run: pnpm build:frontend
+
+      - name: Subir assets estáticos a S3
+        run: |
+          aws s3 sync frontend/dist "s3://$S3_BUCKET" --delete \
+            --cache-control "public,max-age=31536000,immutable" \
+            --exclude "index.html" \
+            --exclude "sw.js" \
+            --exclude "manifest.webmanifest" \
+            --exclude "registerSW.js"
+          aws s3 cp frontend/dist/index.html "s3://$S3_BUCKET/index.html" \
+            --cache-control "no-cache"
+          aws s3 cp frontend/dist/sw.js "s3://$S3_BUCKET/sw.js" \
+            --cache-control "no-cache"
+          aws s3 cp frontend/dist/manifest.webmanifest "s3://$S3_BUCKET/manifest.webmanifest" \
+            --cache-control "no-cache"
+          aws s3 cp frontend/dist/registerSW.js "s3://$S3_BUCKET/registerSW.js" \
+            --cache-control "no-cache"
+
+      - name: Invalidar CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*"
