@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^7.0.5",
     "@pachiplac/optimizer": "workspace:*",
     "@pachiplac/shared": "workspace:*",
+    "@tanstack/react-query": "^5.107.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
@@ -21,6 +22,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.91.0",
+    "react-router-dom": "^7.18.5",
     "tailwind-merge": "^3.7.0",
     "zod": "^3.25.76",
     "zustand": "^5.1.0"
